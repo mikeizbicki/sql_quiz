@@ -3,6 +3,7 @@
  * You are allowed to use a computer in order to:
  * - connect to a running database and run arbitrary commands
  * - reference arbitrary documentation on the internet
+ * - ask AI systems arbitrary questions
  *
  * For each CREATE TABLE statement:
  * Reorder the columns to use the least amount of disk space.
