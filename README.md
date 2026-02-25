@@ -40,8 +40,17 @@ $ cat quiz_example_?.sql | sqlite3 quiz.db
 ```
 
 You might find the following incantation provides more useful output
+<!--
 ```
 $ (echo '.echo on' && echo '.mode markdown' && cat quiz_example_?.sql) | sqlite3 quiz.db
+```
+-->
+```
+$ sqlite3 quiz.db <<EOF
+.echo on
+.mode markdown
+$(cat quiz_example_?.sql)
+EOF 
 ```
 
 You can enter an interactive session with
