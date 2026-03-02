@@ -12,6 +12,10 @@ The above query is equivalent to
 SELECT count(*) FROM basket_a;
 */
 
+--------------------------------------------------------------------------------
+-- set operations
+--------------------------------------------------------------------------------
+
 -- JOINs combine tables "horizontally" whereas set operations combine tables "vertically"
 -- column types must match between the two select statements,
 -- but the final column names will be the column names of the first query
@@ -102,7 +106,7 @@ SELECT count(*) FROM (
     SELECT 'Apple' UNION SELECT 'Orange'
 ) t;
 
-SELECT count(*) FORM (
+SELECT count(*) FROM (
     SELECT 'Apple' UNION SELECT 'Apple'
 ) t;
 
@@ -170,6 +174,10 @@ SELECT count(*) FROM (
 -- sqlite3 does not support INTERSECT ALL or EXCEPT ALL
 -- postgres supports all set operations
 
+--------------------------------------------------------------------------------
+-- "list-like" subqueries
+--------------------------------------------------------------------------------
+
 -- The IN operator lets you compare to a "list"
 -- See: <https://www.postgresql.org/docs/15/functions-comparisons.html#FUNCTIONS-COMPARISONS-IN-SCALAR>
 /*
@@ -196,14 +204,48 @@ SELECT count(*) FROM basket_a WHERE NOT fruit_a IN (NULL);
 SELECT count(*) FROM basket_a WHERE id      IN (SELECT  3      UNION SELECT 4       );
 SELECT count(*) FROM basket_a WHERE fruit_a IN (SELECT 'Apple' UNION SELECT 'Orange');
 
-SELECT count(*)                 FROM basket_a WHERE fruit_a IN (SELECT fruit_b  FROM basket_b);
-SELECT count(*)                 FROM basket_a WHERE fruit_a IN (SELECT DISTINCT fruit_b  FROM basket_b);
+SELECT count(*) FROM basket_a WHERE fruit_a IN (SELECT fruit_b FROM basket_b);
+SELECT count(*) FROM basket_a WHERE fruit_a IN (SELECT DISTINCT fruit_b  FROM basket_b);
 
 -- adding the DISTINCT keyword into the subquery to the right of an IN clause will never change the results
 
-SELECT count(*)                 FROM basket_a WHERE id      IN (SELECT id       FROM basket_b);
-SELECT count(fruit_a)           FROM basket_a WHERE id      IN (SELECT id       FROM basket_b);
-SELECT count(DISTINCT fruit_a)  FROM basket_a WHERE id      IN (SELECT id       FROM basket_b);
+SELECT count(*)                 FROM basket_a WHERE id IN (SELECT id FROM basket_b);
+SELECT count(fruit_a)           FROM basket_a WHERE id IN (SELECT id FROM basket_b);
+SELECT count(DISTINCT fruit_a)  FROM basket_a WHERE id IN (SELECT id FROM basket_b);
+
+-- the ANY/SOME/ALL keywords enable a primitive form of "functional programming"
+
+SELECT count(*) FROM basket_a WHERE id > ANY  (SELECT id FROM basket_b);
+SELECT count(*) FROM basket_a WHERE id > SOME (SELECT id FROM basket_b);
+SELECT count(*) FROM basket_a WHERE id > ALL  (SELECT id FROM basket_b);
+
+-- NOTE:
+-- sqlite3 does not support the ANY/SOME/ALL syntax;
+-- this is because the syntax is "morally equivalent" to "more modern" patterns below;
+-- make sure you understand the difference between the following pairs of commands
+-- i.e., can they ever give different results?
+SELECT count(*) FROM basket_a WHERE id >= (SELECT max(id) FROM basket_b);
+SELECT count(*) FROM basket_a WHERE id >= ALL (SELECT id FROM basket_b);
+
+SELECT count(*) FROM basket_a WHERE id = ANY (SELECT id FROM basket_b);
+SELECT count(*) FROM basket_a WHERE id in (SELECT id FROM basket_b);
+
+-- the EXISTS / NOT EXISTS operators just check if the subquery is non-empty / empty
+
+SELECT count(*) FROM basket_a
+WHERE EXISTS (SELECT 1 FROM basket_b WHERE basket_a.id = basket_b.id);
+
+SELECT count(*) FROM basket_a
+WHERE NOT EXISTS (SELECT 1 FROM basket_b WHERE basket_a.id = basket_b.id);
+
+SELECT count(*) FROM basket_a WHERE     EXISTS (SELECT 1);
+SELECT count(*) FROM basket_a WHERE NOT EXISTS (SELECT 1);
+SELECT count(*) FROM basket_a WHERE     EXISTS (SELECT NULL);
+SELECT count(*) FROM basket_a WHERE NOT EXISTS (SELECT NULL);
+
+--------------------------------------------------------------------------------
+-- OUTER JOINS
+--------------------------------------------------------------------------------
 
 -- We've already seen that the INNER JOIN is syntactic sugar over the cross join plus a condition;
 -- that is, the following two statements are equivalent:
@@ -443,3 +485,13 @@ SELECT count(*)
 FROM basket_b
 RIGHT JOIN basket_a ON (fruit_a = fruit_b)
 WHERE basket_b.id IN (SELECT id FROM basket_a WHERE id < 5);
+
+SELECT count(*)
+FROM basket_b
+RIGHT JOIN basket_a ON (fruit_a = fruit_b)
+WHERE basket_b.id = ANY (SELECT id FROM basket_a WHERE id < 5);
+
+SELECT count(*)
+FROM basket_b
+RIGHT JOIN basket_a ON (fruit_a = fruit_b)
+WHERE basket_b.id = NOT EXISTS (SELECT id FROM basket_a WHERE id < 5);
