@@ -1,9 +1,12 @@
 /* quiz_practice_3.sql
  *
  * This quiz will test your understanding of how much disk space a row uses.
- * You will be allowed to use a computer in order to:
+ * You will be allowed to use a computer.
+ * The only thing disallowed is communicating with another human.
+ * Examples of things you are allowed to do include:
  * - connect to a running database
  * - reference arbitrary documentation on the internet
+ * - ask AI systems arbitrary questions
  *
  * For each CREATE TABLE statement:
  * reorder the columns to use the least amount of disk space.
