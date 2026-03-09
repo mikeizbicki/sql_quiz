@@ -1,5 +1,4 @@
-/* quiz_practice_3.sql
- *
+/*
  * This quiz will test your understanding of how much disk space a row uses.
  * You will be allowed to use a computer.
  * The only thing disallowed is communicating with another human.
@@ -18,7 +17,77 @@
  * At least one of the tables will be taken from the pagila database.
  */
 
-CREATE TABLE example (
+--------------------------------------------------------------------------------
+
+CREATE TABLE example1 (
+    a INTEGER
+);
+
+INSERT INTO example1 (1);
+
+-- header:
+-- data:
+-- padding:
+-- total:
+
+INSERT INTO example1 (NULL);
+
+-- header:
+-- data:
+-- padding:
+-- total:
+
+--------------------------------------------------------------------------------
+
+CREATE TABLE example2 (
+    a SMALLINT,
+    b BIGINT,
+    c INTEGER
+);
+
+INSERT INTO example2 (1,2,3);
+
+INSERT INTO example2 (1,NULL,3);
+
+INSERT INTO example2 (NULL,NULL,NULL);
+
+--------------------------------------------------------------------------------
+
+CREATE TABLE example3 (
+    b BIGINT,
+    c INTEGER,
+    a SMALLINT
+);
+
+INSERT INTO example3 (2,3,1);
+
+INSERT INTO example3 (NULL,3,1);
+
+INSERT INTO example3 (NULL,NULL,NULL);
+
+--------------------------------------------------------------------------------
+
+CREATE TABLE example4 (
+    c1 SMALLINT,
+    c2 SMALLINT,
+    c3 SMALLINT,
+    c4 SMALLINT,
+    c5 SMALLINT,
+    c6 SMALLINT,
+    c7 SMALLINT,
+    c8 SMALLINT,
+    c9 SMALLINT
+);
+
+INSERT INTO example4 (1,2,3,4,5,6,7,8,9);
+
+INSERT INTO example4 (1,2,NULL,4,5,6,7,8,9);
+
+INSERT INTO example4 (NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
+
+--------------------------------------------------------------------------------
+
+CREATE TABLE example5 (
     id INT8,
     a CHAR,
     b INT4,
@@ -28,33 +97,27 @@ CREATE TABLE example (
 );
 
 
-INSERT INTO example VALUES (0, 'a', 0, 0, '{1, 2, 3}', NULL);
+INSERT INTO example5 VALUES (0, 'a', 0, 0, '{1, 2, 3}', NULL);
 
 
-INSERT INTO example VALUES (NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO example5 VALUES (NULL, NULL, NULL, NULL, NULL, NULL);
 
 
-INSERT INTO example VALUES (0, NULL, 0, NULL, '{1, 2, 3}', NULL);
+INSERT INTO example5 VALUES (0, NULL, 0, NULL, '{1, 2, 3}', NULL);
 
 
-INSERT INTO example VALUES (0, 'a', 0, NULL, '{1, 2, 3}', NULL);
+INSERT INTO example5 VALUES (0, 'a', 0, NULL, '{1, 2, 3}', NULL);
 
 
-INSERT INTO example VALUES (0, NULL, 0, 0, '{1, 2, 3}', NULL);
+INSERT INTO example5 VALUES (0, NULL, 0, 0, '{1, 2, 3}', NULL);
 
 
-INSERT INTO example VALUES (NULL, NULL, 0, 0, '{1, 2, 3}', NULL);
+INSERT INTO example5 VALUES (NULL, NULL, 0, 0, '{1, 2, 3}', NULL);
 
 
-INSERT INTO example VALUES (NULL, NULL, 0, 0, NULL, NULL);
+INSERT INTO example5 VALUES (NULL, NULL, 0, 0, NULL, NULL);
 
-
-
-
-
-
-
-
+--------------------------------------------------------------------------------
 
 CREATE TABLE network_connection (
     id BIGSERIAL PRIMARY KEY,
@@ -64,18 +127,10 @@ CREATE TABLE network_connection (
     starttime TIMESTAMP WITH TIME ZONE NOT NULL
 );
 
-
-
 INSERT INTO network_connection (source, dest, starttime, bytes_sent) VALUES 
     ('13:37:DE:AD:BE:EF', 'FF:FF:FF:FF:FF:FF', '2016-01-25 10:10:10.555555-05:00', 10);
 
-
-
-
-
-
-
-
+--------------------------------------------------------------------------------
 
 CREATE TABLE event (
     id BIGSERIAL,
