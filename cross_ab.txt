@@ -1,0 +1,59 @@
+sqlite> select * from basket_a, basket_b;
+| id | fruit_a  | id |  fruit_b   |
+|----|----------|----|------------|
+| 1  | Apple    | 1  | Apple      |
+| 1  | Apple    | 2  | Apple      |
+| 1  | Apple    | 3  | Orange     |
+| 1  | Apple    | 4  | Orange     |
+| 1  | Apple    | 5  | Watermelon |
+| 1  | Apple    |    | Pear       |
+| 1  | Apple    | 6  |            |
+| 1  | Apple    |    |            |
+| 1  | Apple    | 1  | Apple      |
+| 1  | Apple    | 2  | Apple      |
+| 1  | Apple    | 3  | Orange     |
+| 1  | Apple    | 4  | Orange     |
+| 1  | Apple    | 5  | Watermelon |
+| 1  | Apple    |    | Pear       |
+| 1  | Apple    | 6  |            |
+| 1  | Apple    |    |            |
+| 2  | Orange   | 1  | Apple      |
+| 2  | Orange   | 2  | Apple      |
+| 2  | Orange   | 3  | Orange     |
+| 2  | Orange   | 4  | Orange     |
+| 2  | Orange   | 5  | Watermelon |
+| 2  | Orange   |    | Pear       |
+| 2  | Orange   | 6  |            |
+| 2  | Orange   |    |            |
+| 3  | Banana   | 1  | Apple      |
+| 3  | Banana   | 2  | Apple      |
+| 3  | Banana   | 3  | Orange     |
+| 3  | Banana   | 4  | Orange     |
+| 3  | Banana   | 5  | Watermelon |
+| 3  | Banana   |    | Pear       |
+| 3  | Banana   | 6  |            |
+| 3  | Banana   |    |            |
+|    | Cucumber | 1  | Apple      |
+|    | Cucumber | 2  | Apple      |
+|    | Cucumber | 3  | Orange     |
+|    | Cucumber | 4  | Orange     |
+|    | Cucumber | 5  | Watermelon |
+|    | Cucumber |    | Pear       |
+|    | Cucumber | 6  |            |
+|    | Cucumber |    |            |
+| 4  |          | 1  | Apple      |
+| 4  |          | 2  | Apple      |
+| 4  |          | 3  | Orange     |
+| 4  |          | 4  | Orange     |
+| 4  |          | 5  | Watermelon |
+| 4  |          |    | Pear       |
+| 4  |          | 6  |            |
+| 4  |          |    |            |
+|    |          | 1  | Apple      |
+|    |          | 2  | Apple      |
+|    |          | 3  | Orange     |
+|    |          | 4  | Orange     |
+|    |          | 5  | Watermelon |
+|    |          |    | Pear       |
+|    |          | 6  |            |
+|    |          |    |            |

@@ -1,0 +1,67 @@
+sqlite> select * from basket_b as b1, basket_b as b2;
+| id |  fruit_b   | id |  fruit_b   |
+|----|------------|----|------------|
+| 1  | Apple      | 1  | Apple      |
+| 1  | Apple      | 2  | Apple      |
+| 1  | Apple      | 3  | Orange     |
+| 1  | Apple      | 4  | Orange     |
+| 1  | Apple      | 5  | Watermelon |
+| 1  | Apple      |    | Pear       |
+| 1  | Apple      | 6  |            |
+| 1  | Apple      |    |            |
+| 2  | Apple      | 1  | Apple      |
+| 2  | Apple      | 2  | Apple      |
+| 2  | Apple      | 3  | Orange     |
+| 2  | Apple      | 4  | Orange     |
+| 2  | Apple      | 5  | Watermelon |
+| 2  | Apple      |    | Pear       |
+| 2  | Apple      | 6  |            |
+| 2  | Apple      |    |            |
+| 3  | Orange     | 1  | Apple      |
+| 3  | Orange     | 2  | Apple      |
+| 3  | Orange     | 3  | Orange     |
+| 3  | Orange     | 4  | Orange     |
+| 3  | Orange     | 5  | Watermelon |
+| 3  | Orange     |    | Pear       |
+| 3  | Orange     | 6  |            |
+| 3  | Orange     |    |            |
+| 4  | Orange     | 1  | Apple      |
+| 4  | Orange     | 2  | Apple      |
+| 4  | Orange     | 3  | Orange     |
+| 4  | Orange     | 4  | Orange     |
+| 4  | Orange     | 5  | Watermelon |
+| 4  | Orange     |    | Pear       |
+| 4  | Orange     | 6  |            |
+| 4  | Orange     |    |            |
+| 5  | Watermelon | 1  | Apple      |
+| 5  | Watermelon | 2  | Apple      |
+| 5  | Watermelon | 3  | Orange     |
+| 5  | Watermelon | 4  | Orange     |
+| 5  | Watermelon | 5  | Watermelon |
+| 5  | Watermelon |    | Pear       |
+| 5  | Watermelon | 6  |            |
+| 5  | Watermelon |    |            |
+|    | Pear       | 1  | Apple      |
+|    | Pear       | 2  | Apple      |
+|    | Pear       | 3  | Orange     |
+|    | Pear       | 4  | Orange     |
+|    | Pear       | 5  | Watermelon |
+|    | Pear       |    | Pear       |
+|    | Pear       | 6  |            |
+|    | Pear       |    |            |
+| 6  |            | 1  | Apple      |
+| 6  |            | 2  | Apple      |
+| 6  |            | 3  | Orange     |
+| 6  |            | 4  | Orange     |
+| 6  |            | 5  | Watermelon |
+| 6  |            |    | Pear       |
+| 6  |            | 6  |            |
+| 6  |            |    |            |
+|    |            | 1  | Apple      |
+|    |            | 2  | Apple      |
+|    |            | 3  | Orange     |
+|    |            | 4  | Orange     |
+|    |            | 5  | Watermelon |
+|    |            |    | Pear       |
+|    |            | 6  |            |
+|    |            |    |            |

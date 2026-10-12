@@ -1,0 +1,52 @@
+sqlite> select * from basket_a as a1, basket_a as a2;
+| id | fruit_a  | id | fruit_a  |
+|----|----------|----|----------|
+| 1  | Apple    | 1  | Apple    |
+| 1  | Apple    | 1  | Apple    |
+| 1  | Apple    | 2  | Orange   |
+| 1  | Apple    | 3  | Banana   |
+| 1  | Apple    |    | Cucumber |
+| 1  | Apple    | 4  |          |
+| 1  | Apple    |    |          |
+| 1  | Apple    | 1  | Apple    |
+| 1  | Apple    | 1  | Apple    |
+| 1  | Apple    | 2  | Orange   |
+| 1  | Apple    | 3  | Banana   |
+| 1  | Apple    |    | Cucumber |
+| 1  | Apple    | 4  |          |
+| 1  | Apple    |    |          |
+| 2  | Orange   | 1  | Apple    |
+| 2  | Orange   | 1  | Apple    |
+| 2  | Orange   | 2  | Orange   |
+| 2  | Orange   | 3  | Banana   |
+| 2  | Orange   |    | Cucumber |
+| 2  | Orange   | 4  |          |
+| 2  | Orange   |    |          |
+| 3  | Banana   | 1  | Apple    |
+| 3  | Banana   | 1  | Apple    |
+| 3  | Banana   | 2  | Orange   |
+| 3  | Banana   | 3  | Banana   |
+| 3  | Banana   |    | Cucumber |
+| 3  | Banana   | 4  |          |
+| 3  | Banana   |    |          |
+|    | Cucumber | 1  | Apple    |
+|    | Cucumber | 1  | Apple    |
+|    | Cucumber | 2  | Orange   |
+|    | Cucumber | 3  | Banana   |
+|    | Cucumber |    | Cucumber |
+|    | Cucumber | 4  |          |
+|    | Cucumber |    |          |
+| 4  |          | 1  | Apple    |
+| 4  |          | 1  | Apple    |
+| 4  |          | 2  | Orange   |
+| 4  |          | 3  | Banana   |
+| 4  |          |    | Cucumber |
+| 4  |          | 4  |          |
+| 4  |          |    |          |
+|    |          | 1  | Apple    |
+|    |          | 1  | Apple    |
+|    |          | 2  | Orange   |
+|    |          | 3  | Banana   |
+|    |          |    | Cucumber |
+|    |          | 4  |          |
+|    |          |    |          |
