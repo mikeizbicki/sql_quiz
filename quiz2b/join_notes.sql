@@ -14,7 +14,7 @@ INSERT INTO message (mid, sid, model_id) VALUES
  -- (11, 1,    'gpt'),
     (12, 2,    'claude'),
  -- (13, 2,    'claude'),
-    (14, NULL, 'mistral'),
+    (14, NULL, 'mistral')
  -- (15, 3,    'gpt'),
  -- (16, NULL, 'gpt'),
  -- (17, 2,    'claude'),
