@@ -5,6 +5,8 @@ For these operations, the intuition is that NULL represents an "unknown value".
 */
 .mode markdown
 
+-- SQL uses "trinary" logic instead of "binary"
+-- semantically what NULL means is "I don't know"
 CREATE TABLE bool (value BOOLEAN);
 INSERT INTO bool VALUES (TRUE), (FALSE), (NULL);
 

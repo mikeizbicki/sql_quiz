@@ -25,6 +25,8 @@ SELECT 'isn''t SQL weird?';
 -- sql supports the "dollar quoted string literal" syntax
 SELECT $$isn't SQL great?$$;
 SELECT $blah$isn't SQL great?$blah$;
+-- $$ sql standard syntax
+-- not supported by sqlite
 
 -- double quotes for column/relation names
 -- they are optional if no special characters are used in the name
@@ -105,14 +107,18 @@ SELECT sum(id) FROM basket_a WHERE id IS NOT NULL;
 -- if no branch matches and there is no ELSE, the result is NULL
 
 SELECT CASE
+    -- WHEN = if
     WHEN id IS NULL THEN 'no id'
     ELSE 'has id'
     END
 FROM basket_a;
 
 SELECT CASE
+    -- if
     WHEN id < 3 THEN 1
+    -- elif
     WHEN id < 5 THEN 2
+    -- else
     ELSE 3
     END
 FROM basket_a;
@@ -120,12 +126,23 @@ FROM basket_a;
 SELECT CASE
     WHEN id < 3 THEN 1
     WHEN id < 5 THEN 2
+    -- no ELSE => ELSE NULL = default NULL value
     END
 FROM basket_a;
 
 -- CASE has a "simple" form that compares one expression against a list of values
 
-SELECT CASE fruit_a WHEN 'Apple' THEN 1 WHEN 'Orange' THEN 2 END FROM basket_a;
+SELECT CASE fruit_a
+    WHEN 'Apple' THEN 1
+    WHEN 'Orange' THEN 2
+END
+FROM basket_a;
+-- above is syntactic sugar for below
+SELECT CASE 
+    WHEN fruit_a = 'Apple' THEN 1
+    WHEN fruit_a = 'Orange' THEN 2
+END
+FROM basket_a;
 SELECT CASE fruit_a WHEN 'Apple' THEN 1 WHEN NULL THEN 2 END FROM basket_a;
 
 -- CASE is often used alongside aggregates to make them "conditional"
@@ -234,6 +251,8 @@ ORDER BY fruit_a;
 -- but CROSS JOINs are rarely directly used in practice.
 -- The CROSS JOIN joins every row from the first table with every other row from the second table.
 
+-- CROSS JOIN: is SQL version of for loops
+-- count(*) = # rows left table * # rows right table
 SELECT count(*)
 FROM basket_a, basket_b;
 
@@ -241,6 +260,8 @@ SELECT count(*)
 FROM basket_a, basket_b
 WHERE basket_a.id = basket_b.id;
 
+-- any aggregate function:
+-- only considers rows where content in () is non-NULL
 SELECT count(basket_a.id)
 FROM basket_a, basket_b
 WHERE basket_a.id = basket_b.id;
@@ -308,6 +329,12 @@ JOIN basket_b ON basket_a.id > basket_b.id
 GROUP BY fruit_a
 ORDER BY fruit_a;
 
+SELECT fruit_a, /*count(*)*/ *
+FROM basket_a
+JOIN basket_b ON basket_a.id > basket_b.id
+-- GROUP BY fruit_a
+ORDER BY fruit_a;
+
 /*
 the above query is equivalent to 
 
@@ -353,6 +380,8 @@ WHERE id IS NOT NULL;
 SELECT count(DISTINCT id)
 FROM basket_a
 NATURAL JOIN basket_b;
+-- strongly encouraged not to use natural join
+-- because change in schema silently changes the behavior
 
 -- A "self join" is a join of a table with itself.
 -- Self joins are not their own special join type;
@@ -457,6 +486,12 @@ SELECT sum(id) FROM basket_a ORDER BY fruit_a;
 SELECT id, fruit_a, count(*) OVER () FROM basket_a ORDER BY id;
 SELECT count(*) FROM basket_a ORDER BY fruit_a;
 
+/*
+ * inside the () we define a "window" "frame" that the agg func
+ * operates over;
+ * default frame is the entire dataset
+ */
+
 -- the PARTITION BY syntax is like GROUP BY inside of the frame
 
 SELECT id, fruit_a, sum(id) OVER (PARTITION BY fruit_a) FROM basket_a ORDER BY fruit_a;
@@ -495,7 +530,7 @@ SELECT id, fruit_a, sum(id) OVER (ORDER BY id DESC ROWS UNBOUNDED PRECEDING) FRO
 SELECT id, fruit_a, sum(id) OVER (ORDER BY fruit_a DESC ROWS UNBOUNDED PRECEDING) FROM basket_a ORDER BY fruit_a ASC;
 SELECT id, fruit_a, sum(id) OVER (ORDER BY fruit_a DESC ROWS UNBOUNDED PRECEDING) FROM basket_a ORDER BY id ASC;
 
--- CAUTION: recall that NULLS are ordered differently in the sqlite3 and postgres
+-- CAUTION: recall that NULLS are ordered differently in sqlite3 and postgres
 
 SELECT id, sum(id) OVER (ORDER BY id) FROM basket_a;
 SELECT id, sum(id) OVER (ORDER BY id DESC) FROM basket_a;
