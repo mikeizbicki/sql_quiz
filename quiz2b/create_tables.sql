@@ -6,7 +6,7 @@
  * Three tables:
  *
  *   session  a shell session that a conversation belongs to
- *   message  one turn of a conversation
+ *   message  one round of a conversation, prompt and reply
  *   price    what one token costs, per model
  *
  * The schema is intentionally missing several things, and their absence
@@ -35,25 +35,30 @@ CREATE TABLE session (
     name TEXT
 );
 
-/* A message is one turn of one conversation.
+/* A message is one round of one conversation: a prompt and the reply it
+ * got.  Both halves of the exchange live in the same row, as they do in
+ * the `dic` table this schema is taken from.
  *
  * mid       the message's id; it sorts in the order the turns happened
  * prev_mid  the mid of the message this one replies to, or NULL for a
  *           message that begins a conversation
- * sid       the session the turn was written under, or NULL if none
+ * sid       the session the round was written under, or NULL if none
  * model_id  the model that answered, or NULL if the record lost it
- * message   the first sentence of the prompt or of the reply
+ * user      the user's prompt, in one sentence
+ * response  the model's reply, in one sentence
  *
  * Several messages may share one prev_mid: a conversation is a tree and
- * not a list.  Every message with a NULL prev_mid is a root, so the whole
- * table is a forest and not a single tree.
+ * not a list, because one reply can be followed by two different prompts.
+ * Every message with a NULL prev_mid is a root, so the whole table is a
+ * forest and not a single tree.
  */
 CREATE TABLE message (
     mid INT,
     prev_mid INT,
     sid INT,
     model_id TEXT,
-    message TEXT
+    user TEXT,
+    response TEXT
 );
 
 /* A price is what one token costs, for one model.  This is the tool's
@@ -75,23 +80,23 @@ VALUES
     (3,   'c'),
     (NULL, 'a/c');
 
-INSERT INTO message (mid, prev_mid, sid, model_id, message)
+INSERT INTO message (mid, prev_mid, sid, model_id, user, response)
 VALUES
-    (10, NULL, 1,    'gpt',    'how do I reverse a linked list in python?'),
-    (11, 10,   1,    'gpt',    'walk it once with three pointers: prev, cur and next'),
-    (12, 11,   2,    'claude', 'can you show the recursive version instead?'),
-    (13, 11,   2,    NULL,     'why does the recursive version blow the stack?'),
-    (14, 12,   2,    'claude', 'here it is, with a helper that returns the new head'),
-    (15, NULL, 3,    'gpt',    'what is the time complexity of quicksort?'),
-    (15, NULL, 3,    'gpt',    'what is the time complexity of quicksort?'),
-    (16, 15,   NULL, 'gpt',    'average is O(n log n), worst case is O(n^2)'),
-    (17, 13,   2,    'claude', 'python stops at a thousand frames by default'),
-    (18, 17,   2,    'claude', 'how do I raise that limit?'),
-    (19, 16,   NULL, 'gpt',    'when does the worst case actually happen?'),
-    (20, NULL, 3,    'claude', 'write me a haiku about sql'),
-    (21, 20,   3,    'claude', 'tables wait in rows, a join returns the pairs, the index still hums'),
-    (22, 21,   3,    'claude', 'now one about NULL'),
-    (23, 22,   3,    'claude', 'unknown is not false, the row that never matched, waits for a join');
+    (10, NULL, 1,    'gpt',    'how do I reverse a linked list in python?', 'walk it once with three pointers: prev, cur and next'),
+    (11, 10,   1,    'gpt',    'can you show the recursive version instead?', 'here it is, with a helper that returns the new head'),
+    (12, 11,   2,    'claude', 'why does the recursive version blow the stack?', 'python stops at a thousand frames by default'),
+    (13, 11,   2,    'claude', 'can you show it with an explicit stack instead?', 'push each node as you pass it, then pop to relink'),
+    (14, 12,   2,    NULL,     'how do I raise that limit?', 'sys.setrecursionlimit, but an explicit stack is safer'),
+    (15, NULL, 3,    'gpt',    'what is the time complexity of quicksort?', 'average is O(n log n), worst case is O(n^2)'),
+    (15, NULL, 3,    'gpt',    'what is the time complexity of quicksort?', 'average is O(n log n), worst case is O(n^2)'),
+    (16, 15,   NULL, 'gpt',    'when does the worst case actually happen?', 'when the pivot is always the smallest or largest item left'),
+    (17, 13,   2,    'claude', 'does that use less memory?', 'each frame moves to the heap, so the C stack stays flat'),
+    (18, 16,   NULL, 'gpt',    'how do I avoid that?', 'pick a random pivot, or the median of three'),
+    (19, NULL, 3,    'claude', 'write me a haiku about sql', 'tables wait in rows, a join returns the pairs, the index still hums'),
+    (20, 19,   3,    'claude', 'now one about NULL', 'unknown is not false, the row that never matched, waits for a join'),
+    (21, 20,   3,    'claude', 'one about indexes', 'a b-tree of keys, the planner picks a path, seq scan in the rain'),
+    (22, 21,   3,    'claude', 'one about transactions', 'all or none commits, the lock waits for the other, then the world moves on'),
+    (23, 18,   NULL, 'gpt',    'does that help for already sorted input?', 'it helps most there, which is where you need it');
 
 INSERT INTO price (model_id, per_tok)
 VALUES
