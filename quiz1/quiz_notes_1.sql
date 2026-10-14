@@ -157,6 +157,10 @@ SELECT COALESCE(id, 0) FROM basket_a;
 SELECT COALESCE(fruit_a, id, -1) FROM basket_a;
 SELECT COALESCE(NULL, NULL) FROM basket_a;
 
+SELECT sum(COALESCE(id, 0)) FROM basket_a;
+SELECT count(COALESCE(fruit_a, id, -1)) FROM basket_a;
+SELECT count(COALESCE(NULL, NULL)) FROM basket_a;
+
 -- In the ANSI SQL standard:
 -- (1) the LIKE operator is case sensitive
 -- (2) % behaves in the same way as the POSIX glob
