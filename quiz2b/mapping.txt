@@ -1,0 +1,17 @@
+/* The queries below are the quiz2 notes rewritten for the quiz2b schema.
+ * That schema has three tables -- `message`, `session` and `price` -- in
+ * place of the two baskets, and is described at the top of
+ * `create_tables.sql`.  Every query below tests the same concept as the
+ * query it replaces; only the table and column names have changed.
+ *
+ * The mapping is
+ *
+ *     basket_a   ->  message       (the row that has a parent)
+ *     basket_b   ->  session       (the row that has a name)
+ *     a.id       ->  message.sid
+ *     b.id       ->  session.sid
+ *     a.fruit_a  ->  message.model_id
+ *     b.fruit_b  ->  session.name
+ */
+
+

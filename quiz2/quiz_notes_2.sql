@@ -1,4 +1,3 @@
-
 -- A "subquery" is a SELECT statement that is inside another SELECT statement;
 -- Subqueries can also be placed anywhere a tablename can be placed;
 -- Subqueries used in this way must be given a name
@@ -222,7 +221,6 @@ SELECT count(DISTINCT fruit_a)  FROM basket_a WHERE id      IN (SELECT id       
 --     SELECT * FROM a JOIN b ON (a.c1 = b.c2)
 --     UNION ALL
 --     SELECT * FROM a WHERE a.c1 NOT IN (SELECT b.c2 FROM b);
---
 
 SELECT count(*)
 FROM basket_a

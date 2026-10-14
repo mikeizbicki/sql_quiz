@@ -1,19 +1,3 @@
-/* The queries below are the quiz2 notes rewritten for the quiz2b schema.
- * That schema has three tables -- `message`, `session` and `price` -- in
- * place of the two baskets, and is described at the top of
- * `create_tables.sql`.  Every query below tests the same concept as the
- * query it replaces; only the table and column names have changed.
- *
- * The mapping is
- *
- *     basket_a   ->  message       (the row that has a parent)
- *     basket_b   ->  session       (the row that has a name)
- *     a.id       ->  message.sid
- *     b.id       ->  session.sid
- *     a.fruit_a  ->  message.model_id
- *     b.fruit_b  ->  session.name
- */
-
 -- A "subquery" is a SELECT statement that is inside another SELECT statement;
 -- Subqueries can also be placed anywhere a tablename can be placed;
 -- Subqueries used in this way must be given a name
@@ -113,6 +97,7 @@ SELECT count(DISTINCT mid) FROM (
 ) t;
 
 SELECT 'gpt' UNION SELECT 'claude';
+SELECT 'gpt' UNION SELECT 'gpt';
 
 -- INTERSECT ALL returns all rows that are in both queries
 -- INTERSECT also removes duplicates
@@ -206,36 +191,17 @@ SELECT count(*) FROM message WHERE NOT model_id IN (NULL);
 SELECT count(*) FROM message WHERE mid      IN (SELECT 13 UNION SELECT 14);
 SELECT count(*) FROM message WHERE model_id IN (SELECT 'gpt' UNION SELECT 'claude');
 
-SELECT count(*)                 FROM message WHERE model_id IN (SELECT model_id  FROM price);
-SELECT count(*)                 FROM message WHERE model_id IN (SELECT DISTINCT model_id  FROM price);
+SELECT count(*) FROM message WHERE model_id IN (SELECT model_id  FROM price);
+SELECT count(*) FROM message WHERE model_id IN (SELECT DISTINCT model_id  FROM price);
 
 -- adding the DISTINCT keyword into the subquery to the right of an IN clause will never change the results
 
-SELECT count(*)                 FROM message WHERE sid      IN (SELECT sid       FROM session);
-SELECT count(model_id)           FROM message WHERE sid      IN (SELECT sid       FROM session);
-SELECT count(DISTINCT model_id)  FROM message WHERE sid      IN (SELECT sid       FROM session);
-
--- `NOT IN` is where the NULLs bite hardest.  The subquery below returns every
--- session id, the NULL one included, and
---
---     sid NOT IN (1, 2, NULL)
---
--- is `sid != 1 AND sid != 2 AND sid != NULL`, whose last conjunct is NULL for
--- every row.  The result is empty in both engines.
-
-SELECT count(*)
-FROM message
-WHERE sid NOT IN (SELECT sid FROM session);
-
--- Filtering the NULL out of the subquery is not the fix, because the message
--- side has NULLs of its own: the messages whose own sid is NULL are still
--- dropped, and the query still does not answer "which messages have no
--- session".  A LEFT JOIN says what was meant:
-
-SELECT count(*)
-FROM message m
-LEFT JOIN session s ON m.sid = s.sid
-WHERE s.sid IS NULL;
+SELECT count(*)                  FROM message
+    WHERE sid      IN (SELECT sid       FROM session);
+SELECT count(model_id)           FROM message
+    WHERE sid      IN (SELECT sid       FROM session);
+SELECT count(DISTINCT model_id)  FROM message
+    WHERE sid      IN (SELECT sid       FROM session);
 
 -- We've already seen that the INNER JOIN is syntactic sugar over the cross join plus a condition;
 -- that is, the following two statements are equivalent:
@@ -263,7 +229,6 @@ WHERE s.sid IS NULL;
 --     SELECT * FROM a JOIN b ON (a.c1 = b.c2)
 --     UNION ALL
 --     SELECT * FROM a WHERE a.c1 NOT IN (SELECT b.c2 FROM b);
---
 
 SELECT count(*)
 FROM message
@@ -345,43 +310,6 @@ SELECT count(*) FROM message NATURAL FULL JOIN session;
 SELECT count(*) FROM message NATURAL FULL OUTER JOIN session;
 
 SELECT sum(DISTINCT sid) FROM message NATURAL RIGHT JOIN session;
-
--- outer joins can be chained together,
--- and the same table can be used multiple times
-
-SELECT count(*)
-FROM message a1
-LEFT JOIN message a2 USING (sid)
-LEFT JOIN message a3 USING (sid);
-
-SELECT count(*)
-FROM session b1
-LEFT JOIN session b2 USING (sid)
-LEFT JOIN session b3 USING (sid);
-
--- OUTER JOIN order is not commutative
-
-SELECT count(*)
-FROM message a
-LEFT JOIN session b1 USING (sid)
-LEFT JOIN session b2 USING (sid);
-
-SELECT count(*)
-FROM session b1
-LEFT JOIN message a USING (sid)
-LEFT JOIN session b2 USING (sid);
-
-SELECT count(*)
-FROM session b1
-LEFT JOIN session b2 USING (sid)
-LEFT JOIN message a USING (sid);
-
--- when an outer join is combined with any other type of join,
--- then the joins are no longer associative
-
-SELECT count(*) FROM session b1 LEFT JOIN message a USING (sid) JOIN session b2 USING (sid);
-SELECT count(*) FROM (session b1 LEFT JOIN message a USING (sid)) JOIN session b2 USING (sid);
-SELECT count(*) FROM session b1 LEFT JOIN (message a JOIN session b2 USING (sid)) USING (sid);
 
 -- As discussed above, every LEFT/RIGHT JOIN can be written in terms of a subquery;
 -- subqueries are strictly more powerful, however;
@@ -545,10 +473,10 @@ WHERE b.model_id IS NULL;
 -- Section: inner and outer joins mixed across all three tables
 --------------------------------------------------------------------------------
 
--- Every query so far has used two tables and a single join.  A real query
--- threads one row through several tables, and the interesting part is which
--- of those hops is inner and which is outer.  Joins are left-associative:
--- each JOIN combines everything to its left with the table to its right.
+-- Every query so far has used two tables and a single join.
+-- A real query threads one row through several tables.
+-- The important rule to remember is that all JOINs are left-associative,
+-- and so you work through a problem left -> right / top -> bottom.
 
 -- all inner: a message must have a session, and its model must be priced
 
@@ -580,9 +508,10 @@ FROM message
 LEFT JOIN session USING (sid)
 JOIN price USING (model_id);
 
--- The four counts above are all different, and only the first is symmetric in
--- the tables.  Reversing the order of two joins of different kinds changes the
--- answer, which is the same non-associativity seen earlier with two tables.
+-- The four counts above are all different.
+-- Only INNER JOINs are commutative;
+-- all outer joins are non-commutative,
+-- and so changing the order of the joins changes the result.
 
 -- an outer join onto the third table, so that a session no message used still
 -- appears in the output
@@ -598,206 +527,3 @@ SELECT count(*)
 FROM message
 FULL JOIN session USING (sid)
 FULL JOIN price USING (model_id);
-
--- the version that shows the rows instead of counting them.  Every column of
--- every table is named, so which join produced a NULL is visible.
-
-SELECT s.name, m.mid, m.model_id, p.per_tok
-FROM message
-LEFT JOIN session USING (sid)
-LEFT JOIN price USING (model_id)
-ORDER BY m.mid, s.name;
-
---------------------------------------------------------------------------------
--- Section: LATERAL joins
---------------------------------------------------------------------------------
-
--- A LATERAL join is a CROSS JOIN whose right side may mention the current row
--- of the left side.  That is the whole of it:
---
---     SELECT * FROM a,             (SELECT ...) b                -- b is fixed
---     SELECT * FROM a, LATERAL     (SELECT ... WHERE x = a.x) b  -- one b per row of a
---
--- Without LATERAL, a subquery in the FROM clause is evaluated once, before the
--- join, and cannot mention `a` at all.  With it, the subquery is evaluated once
--- per row of `a`, which is the "for loop" intuition of the CROSS JOIN made
--- literal: `a` is the loop variable and the subquery is the loop body.  It is
--- the one place SQL lets the body of a loop see the variable.
---
--- A LEFT JOIN LATERAL is then the same decomposition as any other left outer
--- join: a CROSS JOIN LATERAL, plus every left row that matched nothing with
--- NULLs in every column of the right side.  `ON true` is required by postgres
--- when LATERAL is written with the JOIN keyword.
---
--- sqlite3 has no LATERAL keyword, so every query below is a syntax error
--- there, in both the comma form and the JOIN form.  What sqlite3 has instead,
--- since 3.38, is that a FROM-clause subquery may refer to an earlier table
--- without being told it may:
---
---     SELECT * FROM session s, (SELECT ... WHERE message.sid = s.sid) m
---
--- and that form is an error in postgres, which requires the keyword.  The two
--- engines have the same capability and no syntax in common.
-
--- the newest message in each session.  The subquery runs once per session row,
--- and LIMIT 1 picks that session's newest message and no other's.
-
-SELECT count(*)
-FROM session s
-LEFT JOIN LATERAL (
-    SELECT * FROM message WHERE message.sid = s.sid ORDER BY mid DESC LIMIT 1
-) m ON true;
-
--- which sessions have no messages at all?
-
-SELECT count(*)
-FROM session s
-LEFT JOIN LATERAL (
-    SELECT * FROM message WHERE message.sid = s.sid
-) m ON true
-WHERE m.mid IS NULL;
-
--- the two newest messages in each session.  This is the case a WHERE clause
--- cannot express, because LIMIT 2 has to happen once per session and not once
--- per query: a plain CROSS JOIN with a WHERE would apply the limit to the
--- whole result.
-
-SELECT count(*)
-FROM session s
-LEFT JOIN LATERAL (
-    SELECT * FROM message WHERE message.sid = s.sid ORDER BY mid DESC LIMIT 2
-) m ON true;
-
--- to see what the join produced, print it instead of counting it.  `session`
--- has two rows named 'a/b', so the newest message of that session is printed
--- twice.  (The ordering of the NULL name is the one place sqlite3 and postgres
--- disagree by default; see `quiz_notes_1.sql`.)
-
-SELECT s.name, m.mid, m.model_id
-FROM session s
-LEFT JOIN LATERAL (
-    SELECT * FROM message WHERE message.sid = s.sid ORDER BY mid DESC LIMIT 1
-) m ON true
-ORDER BY s.name, m.mid;
-
--- the same newest-per-session query with a comma instead of the keyword, which
--- parses as a CROSS JOIN and so keeps only the sessions that had a match
-
-SELECT count(*)
-FROM session s,
-LATERAL (SELECT * FROM message WHERE message.sid = s.sid ORDER BY mid DESC LIMIT 1) m;
-
---------------------------------------------------------------------------------
--- Section: recursive CTEs
---------------------------------------------------------------------------------
-
--- A recursive CTE is a WITH clause that refers to itself.  It has the same
--- two-part shape as any other set operation:
---
---     WITH RECURSIVE r AS (
---         SELECT ...                          -- the seed: where the walk starts
---       UNION ALL
---         SELECT ... FROM t JOIN r ON ...     -- the step: how the walk continues
---     )
---     SELECT * FROM r;
---
--- `message` is a forest.  `prev_mid` names the round this one replies to, and
--- a NULL `prev_mid` means the round begins a conversation, so following
--- `prev_mid` upward reconstructs a conversation.  That is exactly what `dic`
--- does to rebuild the history it sends to a model, and the CTE column list is
--- the same idea as the explicit column list a subquery gets with AS.
---
--- postgres requires the RECURSIVE keyword whenever the CTE refers to itself;
--- sqlite3 accepts it but does not require it.  Always write it and both
--- engines agree.  Both forbid aggregates and DISTINCT inside the recursive
--- term; postgres additionally forbids GROUP BY, ORDER BY, LIMIT and OFFSET
--- there, so a recursive query can run in sqlite3 and be rejected by postgres.
---
--- The order of the rows a recursive CTE produces is not defined by the
--- standard and differs between engines.  An ORDER BY belongs outside the CTE.
-
--- every message that the conversation beginning at mid 10 reaches
-
-WITH RECURSIVE thread(mid) AS (
-    SELECT mid FROM message WHERE mid = 10
-  UNION ALL
-    SELECT m.mid FROM message m JOIN thread t ON m.prev_mid = t.mid
-)
-SELECT count(*) FROM thread;
-
--- the duplicate row for mid 17 makes the step visit 17 twice, so changing
--- UNION ALL to UNION changes the answer without the data changing at all
-
-WITH RECURSIVE thread(mid) AS (
-    SELECT mid FROM message WHERE mid = 10
-  UNION
-    SELECT m.mid FROM message m JOIN thread t ON m.prev_mid = t.mid
-)
-SELECT count(*) FROM thread;
-
--- a root that is itself duplicated doubles the whole walk, because the seed
--- produces two identical starting points and every step is applied to both
-
-WITH RECURSIVE thread(mid) AS (
-    SELECT mid FROM message WHERE mid = 15
-  UNION ALL
-    SELECT m.mid FROM message m JOIN thread t ON m.prev_mid = t.mid
-)
-SELECT count(*) FROM thread;
-
--- walking the other way: the conversation that mid 25 belongs to, upward, with
--- the depth of each message
-
-WITH RECURSIVE chain(mid, prev_mid, depth) AS (
-    SELECT mid, prev_mid, 0 FROM message WHERE mid = 25
-  UNION ALL
-    SELECT m.mid, m.prev_mid, chain.depth + 1
-      FROM message m JOIN chain ON m.mid = chain.prev_mid
-)
-SELECT count(*), max(depth) FROM chain;
-
--- every conversation in the table, each row tagged with the root it belongs to
-
-WITH RECURSIVE forest(root, mid) AS (
-    SELECT mid, mid FROM message WHERE prev_mid IS NULL
-  UNION ALL
-    SELECT f.root, m.mid FROM message m JOIN forest f ON m.prev_mid = f.mid
-)
-SELECT count(*) FROM forest;
-
--- the same walk with a depth cap, so that a tree with a cycle in it terminates
--- instead of looping forever.  `dic` caps its own ancestor walk the same way,
--- and a hand-written models file that nests an entry inside itself is exactly
--- the bug the cap is there for.
-
-WITH RECURSIVE thread(mid, depth) AS (
-    SELECT mid, 0 FROM message WHERE mid = 10
-  UNION ALL
-    SELECT m.mid, t.depth + 1
-      FROM message m JOIN thread t ON m.prev_mid = t.mid
-     WHERE t.depth < 3
-)
-SELECT count(*) FROM thread;
-
--- The session tree asks the same kind of question and needs no recursion at
--- all, because a session name is a path and a LIKE can express ancestry:
---
---     child.name LIKE parent.name || '/%'
---
--- Recursion is needed when the parent is named by a column and not by the
--- child.  The two trees in this schema are the same idea stored two different
--- ways, and comparing the queries is the point of the exercise.
-
-SELECT count(*)
-FROM session
-WHERE name = 'a' OR name LIKE 'a' || '/%';
-
--- and the same query against `message`, where it cannot be written this way
--- at all: `prev_mid` names the parent, so the only way to ask is to walk
-
-WITH RECURSIVE subtree(mid) AS (
-    SELECT mid FROM message WHERE mid = 10
-  UNION ALL
-    SELECT m.mid FROM message m JOIN subtree s ON m.prev_mid = s.mid
-)
-SELECT count(*) FROM subtree;

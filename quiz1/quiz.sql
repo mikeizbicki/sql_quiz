@@ -20,7 +20,9 @@ SELECT sum(COALESCE(id, 1)) FROM basket_a;
 
 
 -- Problem 2
-SELECT count(*) FROM basket_a WHERE fruit_a ILIKE '%a%';
+SELECT count(*)
+FROM basket_a
+WHERE fruit_a ILIKE '%a%';
 
 
 
@@ -29,7 +31,9 @@ SELECT count(*) FROM basket_a WHERE fruit_a ILIKE '%a%';
 
 
 -- Problem 3
-SELECT count(*) FROM basket_a a1 JOIN basket_a a2 USING (id, fruit_a);
+SELECT count(*)
+FROM basket_a a1
+JOIN basket_a a2 USING (id);
 
 
 
@@ -38,5 +42,9 @@ SELECT count(*) FROM basket_a a1 JOIN basket_a a2 USING (id, fruit_a);
 
 
 -- Problem 4
-SELECT id, lag(id, 1, 0) OVER (PARTITION BY fruit_a ORDER BY id) FROM basket_a;
+SELECT
+    id,
+    lag(id) OVER (ORDER BY id)
+FROM basket_a
+ORDER BY id;
 
