@@ -6,26 +6,47 @@
  *   - one side must not mention the CTE
  *   - one side must mention the CTE
  */
+
+-- CTE = common table expression
+-- "local variables" "local tables" in sql
+WITH n(i) AS (
+    SELECT 1  -- we start here at the
+              -- non-recursive part
+  UNION ALL
+    SELECT i+1 FROM n WHERE i<5
+)
+-- every recursive iteration:
+-- we take all the new rows from the previous
+-- recursions and those go into the n table
+SELECT * FROM n
+ORDER BY i;
+
+
 WITH RECURSIVE n(i) AS (
-    SELECT 1
+    SELECT 1 UNION ALL SELECT 3
   UNION ALL
     SELECT i+1 FROM n WHERE i<5
 )
 SELECT * FROM n
 ORDER BY i;
 
-
-WITH RECURSIVE n(i) AS (
-    SELECT 1
-  UNION ALL
-    SELECT 3
-  UNION ALL
-    SELECT i+1 FROM n WHERE i<5
-)
-SELECT * FROM n
-ORDER BY i;
-
-
+/*
+iter0:
+ 1
+ 3
+iter1:
+ 2
+ 4
+iter2:
+ 3
+ 5
+iter3:
+ 4
+iter4:
+ 5
+iter5:
+ - add nothing end recursion
+*/
 WITH RECURSIVE n(i) AS (
     SELECT 1 UNION ALL SELECT 3
   UNION
@@ -43,15 +64,27 @@ ORDER BY i;
 -- the query below shows how to get a full conversation history based on a single "leaf"
 
 WITH RECURSIVE history AS (
-    SELECT mid, prev_mid
+    SELECT mid, prev_mid, user, response
     FROM message WHERE mid = 25
   UNION ALL
-    SELECT m.mid, m.prev_mid
+    SELECT m.mid, m.prev_mid, m.user, m.response
     FROM message m
     JOIN history ON m.mid = history.prev_mid
 )
 SELECT * FROM history
 ORDER BY mid;
+
+iter0:
+  mid, prev_mid
+  25,  24
+iter1:
+  24,  13
+iter2:
+  13,  11
+iter3:
+  11,  10
+iter4:
+  10,  NULL
 
 
 WITH RECURSIVE history AS (

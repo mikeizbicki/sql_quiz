@@ -3,13 +3,13 @@
 -- Subqueries used in this way must be given a name
 
 SELECT count(*) FROM (
-    SELECT id FROM basket_a
+    SELECT mid FROM message
 ) AS t; -- the AS is optional
 
 /*
 The above query is equivalent to
 
-SELECT count(*) FROM basket_a;
+SELECT count(*) FROM message;
 */
 
 -- JOINs combine tables "horizontally" whereas set operations combine tables "vertically"
@@ -20,9 +20,9 @@ SELECT count(*) FROM basket_a;
 -- UNION also removes duplicates
 
 SELECT count(*) FROM (
-    SELECT fruit_a FROM basket_a
+    SELECT model_id FROM message
     UNION ALL
-    SELECT fruit_b FROM basket_b
+    SELECT name FROM session
 ) t;
 
 -- NOTE:
@@ -35,9 +35,9 @@ SELECT count(*) FROM (
 The following query is not allowed in postgres, but is allowed in sqlite3
 
 SELECT count(*) FROM (
-    SELECT fruit_a FROM basket_a
+    SELECT model_id FROM message
     UNION ALL
-    SELECT id FROM basket_b
+    SELECT sid FROM session
 ) t;
 */
 
@@ -45,87 +45,92 @@ SELECT count(*) FROM (
 -- UNION ALL: changing the columns will never change the number of rows
 
 SELECT count(*) FROM (
-    SELECT fruit_a FROM basket_a
+    SELECT model_id FROM message
     UNION
-    SELECT fruit_b FROM basket_b
+    SELECT name FROM session
 ) t;
 
 SELECT count(*) FROM (
-    SELECT id, fruit_a FROM basket_a
+    SELECT mid, model_id FROM message
     UNION
-    SELECT id, fruit_b FROM basket_b
+    SELECT sid, name FROM session
 ) t;
 
 SELECT count(*) FROM (
-    SELECT fruit_a FROM basket_a
-    WHERE id < 3
+    SELECT model_id FROM message
+    WHERE mid < 15
     UNION ALL
-    SELECT fruit_b FROM basket_b
-    WHERE id > 3 AND fruit_b ILIKE '%a%'
+    SELECT name FROM session
+    WHERE sid > 1 AND name LIKE '%a%'
 ) t;
 
-SELECT count(id) FROM (
-    SELECT DISTINCT id FROM basket_a
+SELECT count(sid) FROM (
+    SELECT DISTINCT sid FROM message
     UNION ALL
-    SELECT id FROM basket_b
+    SELECT sid FROM session
 ) t;
 
-SELECT count(id) FROM (
-    SELECT DISTINCT id FROM basket_a
+SELECT count(sid) FROM (
+    SELECT DISTINCT sid FROM message
     UNION ALL
-    SELECT DISTINCT id FROM basket_b
+    SELECT DISTINCT sid FROM session
 ) t;
 
-SELECT count(id) FROM (
-    SELECT id FROM basket_a
+SELECT count(sid) FROM (
+    SELECT sid FROM message
     UNION ALL
-    SELECT id FROM basket_b
+    SELECT sid FROM session
 ) t;
 
-SELECT count(DISTINCT id) FROM (
-    SELECT id FROM basket_a
+SELECT count(DISTINCT sid) FROM (
+    SELECT sid FROM message
     UNION ALL
-    SELECT id FROM basket_b
+    SELECT sid FROM session
 ) t;
 
-SELECT count(DISTINCT id) FROM (
-    SELECT id FROM basket_a
-    WHERE
-        fruit_a LIKE '%a%'
+SELECT count(DISTINCT mid) FROM (
+    SELECT mid FROM message
+    WHERE model_id LIKE '%a%'
     UNION ALL
-    SELECT id FROM basket_b
-    WHERE
-        fruit_b LIKE '%A%'
+    SELECT sid FROM session
+    WHERE name LIKE '%A%'
 ) t;
 
-SELECT 'Apple' UNION SELECT 'Orange';
+SELECT 'gpt' UNION SELECT 'claude';
+SELECT 'gpt' UNION SELECT 'gpt';
 
 -- INTERSECT ALL returns all rows that are in both queries
 -- INTERSECT also removes duplicates
 
 SELECT count(*) FROM (
-    SELECT fruit_a FROM basket_a
+    SELECT model_id FROM message
     INTERSECT
-    SELECT fruit_b FROM basket_b
+    SELECT name FROM session
 ) t;
 
 SELECT count(*) FROM (
-    SELECT id, fruit_a FROM basket_a
+    SELECT mid, model_id FROM message
     INTERSECT
-    SELECT id, fruit_b FROM basket_b
+    SELECT sid, name FROM session
 ) t;
 
 SELECT count(*) FROM (
-    SELECT fruit_a FROM basket_a
+    SELECT model_id FROM message
     INTERSECT ALL
-    SELECT fruit_b FROM basket_b
+    SELECT name FROM session
 ) t;
 
 SELECT count(*) FROM (
-    SELECT fruit_a FROM basket_a
+    SELECT model_id FROM message
     INTERSECT
-    SELECT fruit_a FROM basket_a
-    WHERE id < 5
+    SELECT model_id FROM price
+) t;
+
+SELECT count(*) FROM (
+    SELECT model_id FROM message
+    INTERSECT
+    SELECT model_id FROM message
+    WHERE mid < 15
 ) t;
 
 -- EXCEPT ALL returns all rows that are in the first query but not the second
@@ -133,29 +138,29 @@ SELECT count(*) FROM (
 
 SELECT count(*)
 FROM (
-    SELECT fruit_a FROM basket_a
+    SELECT model_id FROM message
     EXCEPT ALL
-    SELECT fruit_b FROM basket_b
+    SELECT name FROM session
 ) t;
 
-SELECT count(DISTINCT fruit_a)
+SELECT count(DISTINCT model_id)
 FROM (
-    SELECT fruit_a FROM basket_a
+    SELECT model_id FROM message
     EXCEPT
-    SELECT fruit_b FROM basket_b
-    WHERE fruit_b IS NOT NULL
+    SELECT name FROM session
+    WHERE name IS NOT NULL
 ) t;
 
 SELECT count(*)
 FROM (
-    SELECT fruit_b FROM basket_b
+    SELECT name FROM session
     EXCEPT
-    SELECT fruit_a FROM basket_a
-    WHERE fruit_a IS NOT NULL
+    SELECT model_id FROM message
+    WHERE model_id IS NOT NULL
 ) t;
 
 SELECT count(*) FROM (
-    SELECT fruit_b FROM basket_b
+    SELECT model_id FROM message
     EXCEPT
     SELECT NULL
 ) t;
@@ -168,32 +173,35 @@ is syntactic sugar for
 A = a OR A = b OR A = c
 */
 
-SELECT count(*) FROM basket_a WHERE id      IN (3, 4);
-SELECT count(*) FROM basket_a WHERE fruit_a IN ('Apple', 'Orange');
-SELECT count(*) FROM basket_a WHERE fruit_a IN (NULL);
+SELECT count(*) FROM message WHERE mid      IN (13, 14);
+SELECT count(*) FROM message WHERE model_id IN ('gpt', 'claude');
+SELECT count(*) FROM message WHERE model_id IN (NULL);
 
-SELECT count(*) FROM basket_a WHERE id      NOT IN (3, 4);
-SELECT count(*) FROM basket_a WHERE fruit_a NOT IN ('Apple', 'Orange');
-SELECT count(*) FROM basket_a WHERE fruit_a NOT IN (NULL);
+SELECT count(*) FROM message WHERE mid      NOT IN (13, 14);
+SELECT count(*) FROM message WHERE model_id NOT IN ('gpt', 'claude');
+SELECT count(*) FROM message WHERE model_id NOT IN (NULL);
 
-SELECT count(*) FROM basket_a WHERE NOT id      IN (3, 4);
-SELECT count(*) FROM basket_a WHERE NOT fruit_a IN ('Apple', 'Orange');
-SELECT count(*) FROM basket_a WHERE NOT fruit_a IN (NULL);
+SELECT count(*) FROM message WHERE NOT mid      IN (13, 14);
+SELECT count(*) FROM message WHERE NOT model_id IN ('gpt', 'claude');
+SELECT count(*) FROM message WHERE NOT model_id IN (NULL);
 
 -- A common use-case for subqueries is to populate the "list" to the right of the IN operator
 -- These subqueries can only have a single column and do not require a name
 
-SELECT count(*) FROM basket_a WHERE id      IN (SELECT  3      UNION SELECT 4       );
-SELECT count(*) FROM basket_a WHERE fruit_a IN (SELECT 'Apple' UNION SELECT 'Orange');
+SELECT count(*) FROM message WHERE mid      IN (SELECT 13 UNION SELECT 14);
+SELECT count(*) FROM message WHERE model_id IN (SELECT 'gpt' UNION SELECT 'claude');
 
-SELECT count(*)                 FROM basket_a WHERE fruit_a IN (SELECT fruit_b  FROM basket_b);
-SELECT count(*)                 FROM basket_a WHERE fruit_a IN (SELECT DISTINCT fruit_b  FROM basket_b);
+SELECT count(*) FROM message WHERE model_id IN (SELECT model_id  FROM price);
+SELECT count(*) FROM message WHERE model_id IN (SELECT DISTINCT model_id  FROM price);
 
 -- adding the DISTINCT keyword into the subquery to the right of an IN clause will never change the results
 
-SELECT count(*)                 FROM basket_a WHERE id      IN (SELECT id       FROM basket_b);
-SELECT count(fruit_a)           FROM basket_a WHERE id      IN (SELECT id       FROM basket_b);
-SELECT count(DISTINCT fruit_a)  FROM basket_a WHERE id      IN (SELECT id       FROM basket_b);
+SELECT count(*)                  FROM message
+    WHERE sid      IN (SELECT sid       FROM session);
+SELECT count(model_id)           FROM message
+    WHERE sid      IN (SELECT sid       FROM session);
+SELECT count(DISTINCT model_id)  FROM message
+    WHERE sid      IN (SELECT sid       FROM session);
 
 -- We've already seen that the INNER JOIN is syntactic sugar over the cross join plus a condition;
 -- that is, the following two statements are equivalent:
@@ -223,213 +231,299 @@ SELECT count(DISTINCT fruit_a)  FROM basket_a WHERE id      IN (SELECT id       
 --     SELECT * FROM a WHERE a.c1 NOT IN (SELECT b.c2 FROM b);
 
 SELECT count(*)
-FROM basket_a
-LEFT JOIN basket_b USING (id);
+FROM message
+LEFT JOIN session USING (sid);
 
-SELECT count(fruit_b)
-FROM basket_a
-LEFT JOIN basket_b USING (id);
+SELECT count(name)
+FROM message
+LEFT JOIN session USING (sid);
 
-SELECT count(DISTINCT fruit_b)
-FROM basket_a
-LEFT JOIN basket_b USING (id);
+SELECT count(DISTINCT name)
+FROM message
+LEFT JOIN session USING (sid);
 
 SELECT count(*)
-FROM basket_a
-LEFT JOIN basket_b USING (id)
+FROM message
+LEFT JOIN session USING (sid)
 WHERE
-    fruit_b LIKE '%a%';
+    name LIKE '%a%';
 
 SELECT count(*)
-FROM basket_a
-LEFT JOIN basket_b USING (id)
+FROM message
+LEFT JOIN session USING (sid)
 WHERE
-    id > 1;
+    sid > 1;
 
 SELECT count(*)
-FROM basket_a
-LEFT JOIN basket_b ON (fruit_a = fruit_b);
+FROM message
+LEFT JOIN session ON (model_id = name);
 
 SELECT count(*)
-FROM basket_a
-LEFT JOIN basket_b ON (fruit_a = fruit_b AND basket_a.id = basket_b.id);
+FROM message
+LEFT JOIN session ON (model_id = name AND message.sid = session.sid);
 
 SELECT count(*)
-FROM basket_a
-LEFT JOIN basket_b ON (fruit_a = fruit_b OR basket_a.id = basket_b.id);
+FROM message
+LEFT JOIN session ON (model_id = name OR message.sid = session.sid);
 
 SELECT count(*)
-FROM basket_a
-LEFT JOIN basket_b ON (basket_a.id < basket_b.id);
+FROM message
+LEFT JOIN session ON (message.sid < session.sid);
 
 -- A RIGHT JOIN B is equivalent to B LEFT JOIN A
 
 SELECT count(*)
-FROM basket_a
-RIGHT JOIN basket_b USING (id);
+FROM message
+RIGHT JOIN session USING (sid);
 
 -- A FULL JOIN is like a "right join plus a left join"
 
 SELECT count(*)
-FROM basket_a
-FULL JOIN basket_b USING (id);
+FROM message
+FULL JOIN session USING (sid);
 
 -- The LEFT, RIGHT, and FULL JOINs are all examples of OUTER JOINs.
 -- The OUTER keyword can be added without changing the meaning.
 
 SELECT count(*)
-FROM basket_a
-FULL OUTER JOIN basket_b USING (id);
+FROM message
+FULL OUTER JOIN session USING (sid);
 
 SELECT count(*)
-FROM basket_a
-LEFT OUTER JOIN basket_b USING (id);
+FROM message
+LEFT OUTER JOIN session USING (sid);
 
 SELECT count(*)
-FROM basket_a
-RIGHT OUTER JOIN basket_b USING (id);
+FROM message
+RIGHT OUTER JOIN session USING (sid);
 
 -- The "natural" join is syntactic sugar over the USING clause:
 -- it is equivalent to using the USING clause over all columns with the same name;
 -- The natural join is not a separate type of join, and can be combined with INNER/LEFT/RIGHT joins
 
-SELECT count(*) FROM basket_a NATURAL JOIN basket_b;
-SELECT count(*) FROM basket_a NATURAL LEFT JOIN basket_b;
-SELECT count(*) FROM basket_a NATURAL LEFT OUTER JOIN basket_b;
-SELECT count(*) FROM basket_a NATURAL RIGHT JOIN basket_b;
-SELECT count(*) FROM basket_a NATURAL RIGHT OUTER JOIN basket_b;
-SELECT count(*) FROM basket_a NATURAL FULL JOIN basket_b;
-SELECT count(*) FROM basket_a NATURAL FULL OUTER JOIN basket_b;
+SELECT count(*) FROM message NATURAL JOIN session;
+SELECT count(*) FROM message NATURAL LEFT JOIN session;
+SELECT count(*) FROM message NATURAL LEFT OUTER JOIN session;
+SELECT count(*) FROM message NATURAL RIGHT JOIN session;
+SELECT count(*) FROM message NATURAL RIGHT OUTER JOIN session;
+SELECT count(*) FROM message NATURAL FULL JOIN session;
+SELECT count(*) FROM message NATURAL FULL OUTER JOIN session;
 
-SELECT sum(DISTINCT id) FROM basket_a NATURAL RIGHT JOIN basket_b;
-
--- outer joins can be chained together,
--- and the same table can be used multiple times
-
-SELECT count(*)
-FROM basket_a a1
-LEFT JOIN basket_a a2 USING (id)
-LEFT JOIN basket_a a3 USING (id);
-
-SELECT count(*)
-FROM basket_b b1
-LEFT JOIN basket_b b2 USING (id)
-LEFT JOIN basket_b b3 USING (id);
-
--- OUTER JOIN order is not commutative
-
-SELECT count(*)
-FROM basket_a a
-LEFT JOIN basket_b b1 USING (id)
-LEFT JOIN basket_b b2 USING (id);
-
-SELECT count(*)
-FROM basket_b b1
-LEFT JOIN basket_a a USING (id)
-LEFT JOIN basket_b b2 USING (id);
-
-SELECT count(*)
-FROM basket_b b1
-LEFT JOIN basket_b b2 USING (id)
-LEFT JOIN basket_a a USING (id);
-
--- when an outer join is combined with any other type of join,
--- then the joins are no longer associative
-
-SELECT count(*) FROM basket_b b1 LEFT JOIN basket_a a USING (id) JOIN basket_b b2 USING (id);
-SELECT count(*) FROM (basket_b b1 LEFT JOIN basket_a a USING (id)) JOIN basket_b b2 USING (id);
-SELECT count(*) FROM basket_b b1 LEFT JOIN (basket_a a JOIN basket_b b2 USING (id)) USING (id);
+SELECT sum(DISTINCT sid) FROM message NATURAL RIGHT JOIN session;
 
 -- As discussed above, every LEFT/RIGHT JOIN can be written in terms of a subquery;
 -- subqueries are strictly more powerful, however;
 -- if a subquery contains an aggregate function, then it cannot be re-written as a join
 
 SELECT count(*) FROM (
-    SELECT sum(id) FROM basket_a
+    SELECT sum(mid) FROM message
     UNION
-    SELECT sum(id) FROM basket_b
+    SELECT sum(sid) FROM session
 ) t;
 
 SELECT count(*) FROM (
-    SELECT sum(DISTINCT id) FROM basket_a
+    SELECT sum(DISTINCT mid) FROM message
     UNION
-    SELECT sum(id) FROM basket_b WHERE id < 5
+    SELECT sum(sid) FROM session WHERE sid < 5
 ) t;
 
 SELECT count(*) FROM (
-    SELECT count(id) FROM basket_a
+    SELECT count(mid) FROM message
     UNION
-    SELECT id FROM basket_b
+    SELECT sid FROM session
 ) t;
 
 SELECT count(*)
-FROM basket_a
-WHERE id NOT IN (SELECT sum(id) FROM basket_b WHERE fruit_b ILIKE '%a%');
+FROM message
+WHERE sid NOT IN (SELECT sum(sid) FROM session WHERE name ILIKE '%a%');
 
 SELECT count(*)
-FROM basket_b
-WHERE id IN (SELECT count(id) FROM basket_b WHERE fruit_b ILIKE '%a%');
+FROM session
+WHERE sid IN (SELECT count(sid) FROM session WHERE name ILIKE '%a%');
 
 SELECT count(*)
-FROM basket_b
-WHERE id IN (SELECT count(id) FROM basket_a WHERE id < 5);
+FROM session
+WHERE sid IN (SELECT count(sid) FROM message WHERE sid < 5);
 
 -- subqueries can be combined with JOINs
 
 SELECT count(*)
-FROM basket_b
-WHERE id IN (
-    SELECT count(id)
-    FROM basket_a
-    JOIN basket_b USING (id)
-    WHERE id < 5
+FROM session
+WHERE sid IN (
+    SELECT count(sid)
+    FROM message
+    JOIN session USING (sid)
+    WHERE sid < 5
 );
 
 SELECT count(*)
-FROM basket_b, basket_a
-WHERE basket_b.id IN (
-    SELECT count(id)
-    FROM basket_a
-    JOIN basket_b USING (id)
-    WHERE id < 5
+FROM session, message
+WHERE session.sid IN (
+    SELECT count(sid)
+    FROM message
+    JOIN session USING (sid)
+    WHERE sid < 5
 );
 
 SELECT count(*)
-FROM basket_b
-LEFT JOIN basket_a USING (id)
-WHERE basket_b.id IN (
-    SELECT count(id)
-    FROM basket_a
-    JOIN basket_b USING (id)
-    WHERE id < 5
+FROM session
+LEFT JOIN message USING (sid)
+WHERE session.sid IN (
+    SELECT count(sid)
+    FROM message
+    JOIN session USING (sid)
+    WHERE sid < 5
 );
 
 SELECT count(*)
-FROM basket_b
-RIGHT JOIN basket_a USING (id)
-WHERE basket_b.id IN (
-    SELECT count(id)
-    FROM basket_a
-    JOIN basket_b USING (id)
-    WHERE id < 5
+FROM session
+RIGHT JOIN message USING (sid)
+WHERE session.sid IN (
+    SELECT count(sid)
+    FROM message
+    JOIN session USING (sid)
+    WHERE sid < 5
 );
 
 SELECT count(*)
-FROM basket_b
-RIGHT JOIN basket_a USING (id)
-WHERE basket_b.id IN (SELECT id FROM basket_a WHERE id < 5);
+FROM session
+RIGHT JOIN message USING (sid)
+WHERE session.sid IN (SELECT sid FROM message WHERE sid < 5);
 
 SELECT count(*)
-FROM basket_b
-LEFT JOIN basket_a USING (id)
-WHERE basket_b.id IN (SELECT id FROM basket_a WHERE id < 5);
+FROM session
+LEFT JOIN message USING (sid)
+WHERE session.sid IN (SELECT sid FROM message WHERE sid < 5);
 
 SELECT count(*)
-FROM basket_b
-LEFT JOIN basket_a ON (fruit_a = fruit_b)
-WHERE basket_b.id IN (SELECT id FROM basket_a WHERE id < 5);
+FROM session
+LEFT JOIN message ON (model_id = name)
+WHERE session.sid IN (SELECT sid FROM message WHERE sid < 5);
 
 SELECT count(*)
-FROM basket_b
-RIGHT JOIN basket_a ON (fruit_a = fruit_b)
-WHERE basket_b.id IN (SELECT id FROM basket_a WHERE id < 5);
+FROM session
+RIGHT JOIN message ON (model_id = name)
+WHERE session.sid IN (SELECT sid FROM message WHERE sid < 5);
+
+--------------------------------------------------------------------------------
+-- Section: non-equality join conditions
+--------------------------------------------------------------------------------
+
+-- Every join condition so far has been an equality, but nothing requires one.
+-- A non-equality condition answers a question an equality cannot: which value
+-- is bigger, which value came first, and which value is contained in which.
+-- They are also where the NULL rules bite hardest, because `NULL < 3` and
+-- `NULL > 3` are both NULL, so a non-equality join drops NULL rows even when
+-- the columns on both sides are perfectly good.
+
+-- 1. Containment: which session is a descendant of which other session?
+--    A session name is a path, so 'a/b/c' LIKE 'a' || '/%' is true while
+--    'ab' LIKE 'a' || '/%' is false.  This is the query `dic --cost-session`
+--    uses to total a session together with everything nested under it.
+
+SELECT count(*)
+FROM session child
+JOIN session parent ON (child.name LIKE parent.name || '/%');
+
+-- the same question as an outer join: which sessions are nobody's ancestor?
+
+SELECT count(*)
+FROM session parent
+LEFT JOIN session child ON (child.name LIKE parent.name || '/%')
+WHERE child.name IS NULL;
+
+-- 2. Ordering: which pairs of messages are in the same session, in order?
+--    This is a rank without a window function: it counts how many messages
+--    a message comes after within its own session.
+
+SELECT count(*)
+FROM message a
+JOIN message b ON (a.sid = b.sid AND a.mid > b.mid);
+
+-- the outer version asks for the first message of each session.  Note that a
+-- duplicated row changes the answer, because both copies count as first.
+
+SELECT count(*)
+FROM message a
+LEFT JOIN message b ON (a.sid = b.sid AND a.mid > b.mid)
+WHERE b.mid IS NULL;
+
+-- 3. Threshold: which models cost no more than which other models?
+
+SELECT count(*)
+FROM price a
+JOIN price b ON (a.per_tok <= b.per_tok);
+
+-- and the outer version: which model is strictly the cheapest?
+
+SELECT count(*)
+FROM price a
+LEFT JOIN price b ON (b.per_tok < a.per_tok)
+WHERE b.model_id IS NULL;
+
+-- 4. The NULL trap.  `a.mid > b.mid` is NULL whenever either side is NULL,
+--    so the inner join above does not count the three messages whose sid is
+--    NULL, while the left join counts all three as "first" in their session.
+--    In query 2 the equality `a.sid = b.sid` decides which rows are
+--    candidates and the non-equality decides which of them survive, so the
+--    two operators fail in different ways and have to be reasoned about
+--    separately.
+
+--------------------------------------------------------------------------------
+-- Section: inner and outer joins mixed across all three tables
+--------------------------------------------------------------------------------
+
+-- Every query so far has used two tables and a single join.
+-- A real query threads one row through several tables.
+-- The important rule to remember is that all JOINs are left-associative,
+-- and so you work through a problem left -> right / top -> bottom.
+
+-- all inner: a message must have a session, and its model must be priced
+
+SELECT count(*)
+FROM message
+JOIN session USING (sid)
+JOIN price USING (model_id);
+
+-- all outer: nothing is dropped, so every message appears
+
+SELECT count(*)
+FROM message
+LEFT JOIN session USING (sid)
+LEFT JOIN price USING (model_id);
+
+-- inner then outer: the session join drops the messages that have no session,
+-- and then every remaining message is kept whether or not it is priced
+
+SELECT count(*)
+FROM message
+JOIN session USING (sid)
+LEFT JOIN price USING (model_id);
+
+-- outer then inner: the session join keeps everything, and then the price join
+-- drops the messages whose model is NULL or has no price row
+
+SELECT count(*)
+FROM message
+LEFT JOIN session USING (sid)
+JOIN price USING (model_id);
+
+-- The four counts above are all different.
+-- Only INNER JOINs are commutative;
+-- all outer joins are non-commutative,
+-- and so changing the order of the joins changes the result.
+
+-- an outer join onto the third table, so that a session no message used still
+-- appears in the output
+
+SELECT count(*)
+FROM session
+LEFT JOIN message USING (sid)
+LEFT JOIN price USING (model_id);
+
+-- a full join, to see both unmatched sides at once
+
+SELECT count(*)
+FROM message
+FULL JOIN session USING (sid)
+FULL JOIN price USING (model_id);

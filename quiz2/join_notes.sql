@@ -7,205 +7,207 @@
  *  - behavior of NULL values
  */
 
-CREATE TABLE basket_a (id INTEGER, fruit_a TEXT);
-INSERT INTO basket_a (id, fruit_a) VALUES
-    (1, 'Apple'),
-    (1, 'Apple'),
-    (2, 'Orange'),
- -- (3, 'Banana'),
-    (NULL, 'Cucumber'),
- -- (4, NULL),
- -- (NULL, NULL)
+CREATE TABLE message (mid INTEGER, sid INTEGER, model_id TEXT);
+INSERT INTO message (mid, sid, model_id) VALUES
+    (10, 1,    'gpt'),
+    (10, 1,    'gpt'),
+    (12, 2,    'claude'),
+    (14, NULL, 'mistral')
     ;
 
-CREATE TABLE basket_b (id INTEGER, fruit_b TEXT);
-INSERT INTO basket_b (id, fruit_b) VALUES
-    (1, 'Apple'),
-    (2, 'Apple'),
- -- (3, 'Orange'),
- -- (4, 'Orange'),
- -- (5, 'Watermelon'),
-    (NULL, 'Pear');
- -- (6, NULL),
- -- (NULL, NULL)
+CREATE TABLE session (sid INTEGER, name TEXT);
+INSERT INTO session (sid, name) VALUES
+    (1,    'gpt'),
+    (2,    'gpt'),
+    (3,    'llama'),
+    (NULL, 'claude')
+    ;
 
 
-SELECT * FROM basket_b, basket_a;
+SELECT * FROM session, message;
 /*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 2  | Orange   |
-  | 1  | Apple   |    | Cucumber |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 2  | Orange   |
-  | 2  | Apple   |    | Cucumber |
-  |    | Pear    | 1  | Apple    |
-  |    | Pear    | 1  | Apple    |
-  |    | Pear    | 2  | Orange   |
-  |    | Pear    |    | Cucumber |
-*/
-
-SELECT * FROM basket_b JOIN basket_a;
-/*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 2  | Orange   |
-  | 1  | Apple   |    | Cucumber |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 2  | Orange   |
-  | 2  | Apple   |    | Cucumber |
-  |    | Pear    | 1  | Apple    |
-  |    | Pear    | 1  | Apple    |
-  |    | Pear    | 2  | Orange   |
-  |    | Pear    |    | Cucumber |
+  | sid | name   | mid | sid | model_id |
+  |-----|--------|-----|-----|----------|
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  12 | 2   | claude   |
+  | 1   | gpt    |  14 |     | mistral  |
+  | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  12 | 2   | claude   |
+  | 2   | gpt    |  14 |     | mistral  |
+  | 3   | llama  |  10 | 1   | gpt      |
+  | 3   | llama  |  10 | 1   | gpt      |
+  | 3   | llama  |  12 | 2   | claude   |
+  | 3   | llama  |  14 |     | mistral  |
+  |     | claude |  10 | 1   | gpt      |
+  |     | claude |  10 | 1   | gpt      |
+  |     | claude |  12 | 2   | claude   |
+  |     | claude |  14 |     | mistral  |
 */
 
 ----------------------------------------
--- EXAMPLE: JOIN on id
+-- EXAMPLE: JOIN on sid
 ----------------------------------------
 
-SELECT * FROM basket_b JOIN basket_a ON basket_b.id = basket_a.id;
+SELECT * FROM session
+JOIN message ON session.sid = message.sid;
 /*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 2  | Orange   |
-- | 1  | Apple   |    | Cucumber |
-- | 2  | Apple   | 1  | Apple    |
-- | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 2  | Orange   |
-- | 2  | Apple   |    | Cucumber |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 2  | Orange   |
-- |    | Pear    |    | Cucumber |
+  | sid | name   | mid | sid | model_id |
+  |-----|--------|-----|-----|----------|
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  10 | 1   | gpt      |
+- | 1   | gpt    |  12 | 2   | claude   |
+- | 1   | gpt    |  14 |     | mistral  |
+- | 2   | gpt    |  10 | 1   | gpt      |
+- | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  12 | 2   | claude   |
+- | 2   | gpt    |  14 |     | mistral  |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  12 | 2   | claude   |
+- | 3   | llama  |  14 |     | mistral  |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  12 | 2   | claude   |
+- |     | claude |  14 |     | mistral  |
 */
 
-SELECT * FROM basket_b LEFT JOIN basket_a ON basket_b.id = basket_a.id;
+SELECT * FROM session
+LEFT JOIN message ON session.sid = message.sid;
 /*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 2  | Orange   |
-- | 1  | Apple   |    | Cucumber |
-- | 2  | Apple   | 1  | Apple    |
-- | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 2  | Orange   |
-- | 2  | Apple   |    | Cucumber |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 2  | Orange   |
-- |    | Pear    |    | Cucumber |
-+ |    | Pear    |    |          |
+  | sid | name   | mid | sid | model_id |
+  |-----|--------|-----|-----|----------|
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  10 | 1   | gpt      |
+- | 1   | gpt    |  12 | 2   | claude   |
+- | 1   | gpt    |  14 |     | mistral  |
+- | 2   | gpt    |  10 | 1   | gpt      |
+- | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  12 | 2   | claude   |
+- | 2   | gpt    |  14 |     | mistral  |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  12 | 2   | claude   |
+- | 3   | llama  |  14 |     | mistral  |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  12 | 2   | claude   |
+- |     | claude |  14 |     | mistral  |
++ | 3   | llama  |     |     |          |
++ |     | claude |     |     |          |
 */
 
-SELECT * FROM basket_b RIGHT JOIN basket_a ON basket_b.id = basket_a.id;
+SELECT * FROM session RIGHT JOIN message ON session.sid = message.sid;
 /*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 2  | Orange   |
-- | 1  | Apple   |    | Cucumber |
-- | 2  | Apple   | 1  | Apple    |
-- | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 2  | Orange   |
-- | 2  | Apple   |    | Cucumber |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 2  | Orange   |
-- |    | Pear    |    | Cucumber |
-+ |    |         |    | Cucumber |
+  | sid | name   | mid | sid | model_id |
+  |-----|--------|-----|-----|----------|
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  10 | 1   | gpt      |
+- | 1   | gpt    |  12 | 2   | claude   |
+- | 1   | gpt    |  14 |     | mistral  |
+- | 2   | gpt    |  10 | 1   | gpt      |
+- | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  12 | 2   | claude   |
+- | 2   | gpt    |  14 |     | mistral  |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  12 | 2   | claude   |
+- | 3   | llama  |  14 |     | mistral  |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  12 | 2   | claude   |
+- |     | claude |  14 |     | mistral  |
++ |     |        |  14 |     | mistral  |
 */
 
 ----------------------------------------
--- EXAMPLE: JOIN on fruit
+-- EXAMPLE: JOIN on model_id = name
 ----------------------------------------
 
-SELECT * FROM basket_b JOIN basket_a ON basket_b.fruit_b = basket_a.fruit_a;
+SELECT * FROM session
+JOIN message ON session.name = message.model_id;
 /*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 2  | Orange   |
-- | 1  | Apple   |    | Cucumber |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 1  | Apple    |
-- | 2  | Apple   | 2  | Orange   |
-- | 2  | Apple   |    | Cucumber |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 2  | Orange   |
-- |    | Pear    |    | Cucumber |
+  | sid | name   | mid | sid | model_id |
+  |-----|--------|-----|-----|----------|
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  10 | 1   | gpt      |
+- | 1   | gpt    |  12 | 2   | claude   |
+- | 1   | gpt    |  14 |     | mistral  |
+  | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  10 | 1   | gpt      |
+- | 2   | gpt    |  12 | 2   | claude   |
+- | 2   | gpt    |  14 |     | mistral  |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  12 | 2   | claude   |
+- | 3   | llama  |  14 |     | mistral  |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  10 | 1   | gpt      |
+  |     | claude |  12 | 2   | claude   |
+- |     | claude |  14 |     | mistral  |
 */
 
-SELECT * FROM basket_b LEFT JOIN basket_a ON basket_b.fruit_b = basket_a.fruit_a;
+SELECT * FROM session
+LEFT JOIN message ON session.name = message.model_id;
 /*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 2  | Orange   |
-- | 1  | Apple   |    | Cucumber |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 1  | Apple    |
-- | 2  | Apple   | 2  | Orange   |
-- | 2  | Apple   |    | Cucumber |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 2  | Orange   |
-- |    | Pear    |    | Cucumber |
-+ |    | Pear    |    |          |
+  | sid | name   | mid | sid | model_id |
+  |-----|--------|-----|-----|----------|
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  10 | 1   | gpt      |
+- | 1   | gpt    |  12 | 2   | claude   |
+- | 1   | gpt    |  14 |     | mistral  |
+  | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  10 | 1   | gpt      |
+- | 2   | gpt    |  12 | 2   | claude   |
+- | 2   | gpt    |  14 |     | mistral  |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  12 | 2   | claude   |
+- | 3   | llama  |  14 |     | mistral  |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  10 | 1   | gpt      |
+  |     | claude |  12 | 2   | claude   |
+- |     | claude |  14 |     | mistral  |
++ | 3   | llama  |     |     |          |
 */
 
-SELECT * FROM basket_b RIGHT JOIN basket_a ON basket_b.fruit_b = basket_a.fruit_a;
+SELECT * FROM session
+RIGHT JOIN message ON session.name = message.model_id;
 /*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 2  | Orange   |
-- | 1  | Apple   |    | Cucumber |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 1  | Apple    |
-- | 2  | Apple   | 2  | Orange   |
-- | 2  | Apple   |    | Cucumber |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 2  | Orange   |
-- |    | Pear    |    | Cucumber |
-+ |    |         | 2  | Orange   |
-+ |    |         |    | Cucumber |
+  | sid | name   | mid | sid | model_id |
+  |-----|--------|-----|-----|----------|
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  10 | 1   | gpt      |
+- | 1   | gpt    |  12 | 2   | claude   |
+- | 1   | gpt    |  14 |     | mistral  |
+  | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  10 | 1   | gpt      |
+- | 2   | gpt    |  12 | 2   | claude   |
+- | 2   | gpt    |  14 |     | mistral  |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  10 | 1   | gpt      |
+- | 3   | llama  |  12 | 2   | claude   |
+- | 3   | llama  |  14 |     | mistral  |
+- |     | claude |  10 | 1   | gpt      |
+- |     | claude |  10 | 1   | gpt      |
+  |     | claude |  12 | 2   | claude   |
+- |     | claude |  14 |     | mistral  |
++ |     |        |  14 |     | mistral  |
 */
 
-SELECT * FROM basket_b FULL JOIN basket_a ON basket_b.fruit_b = basket_a.fruit_a;
+SELECT * FROM session
+FULL JOIN message ON session.name = message.model_id;
 /*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-  | 1  | Apple   | 1  | Apple    |
-  | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 2  | Orange   |
-- | 1  | Apple   |    | Cucumber |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 1  | Apple    |
-- | 2  | Apple   | 2  | Orange   |
-- | 2  | Apple   |    | Cucumber |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 2  | Orange   |
-- |    | Pear    |    | Cucumber |
-+ |    | Pear    |    |          |    -- LEFT
-+ |    |         | 2  | Orange   |    -- RIGHT
-+ |    |         |    | Cucumber |    -- RIGHT
+  | sid | name   | mid | sid | model_id |
+  |-----|--------|-----|-----|----------|
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 1   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  10 | 1   | gpt      |
+  | 2   | gpt    |  10 | 1   | gpt      |
+  |     | claude |  12 | 2   | claude   |
++ | 3   | llama  |     |     |          |    -- LEFT
++ |     |        |  14 |     | mistral  |    -- RIGHT
 */
 
 ----------------------------------------
@@ -213,69 +215,83 @@ SELECT * FROM basket_b FULL JOIN basket_a ON basket_b.fruit_b = basket_a.fruit_a
 -- LEFT/RIGHT JOIN + IS NULL "like" WHERE NOT IN + subquery
 ----------------------------------------
 
-SELECT basket_a.* FROM basket_b RIGHT JOIN basket_a ON basket_b.fruit_b = basket_a.fruit_a
-WHERE fruit_b IS NULL;
+SELECT message.* FROM session
+RIGHT JOIN message ON session.name = message.model_id
+WHERE name IS NULL;
 
 /*
-| id | fruit_a  |
-|----|----------|
-| 2  | Orange   |
-|    | Cucumber |
+| mid | sid | model_id |
+|-----|-----|----------|
+|  14 |     | mistral  |
 */
 
-SELECT * FROM basket_a
-WHERE fruit_a NOT IN (SELECT fruit_b FROM basket_b);
+SELECT * FROM message
+WHERE model_id NOT IN (
+    SELECT name FROM session
+);
 
 /*
-| id | fruit_a  |
-|----|----------|
-| 2  | Orange   |
-|    | Cucumber |
+| mid | sid | model_id |
+|-----|-----|----------|
+|  14 |     | mistral  |
 */
 
 -- the intuition will be violated when there are NULL values in columns
 
-SELECT basket_b.* FROM basket_b LEFT JOIN basket_a ON basket_b.id = basket_a.id
-WHERE fruit_a IS NULL;
+SELECT session.* FROM session
+LEFT JOIN message ON session.sid = message.sid
+WHERE model_id IS NULL;
 
 /*
-| id | fruit_b |
-|----|---------|
-|    | Pear    | 
+| sid | name   |
+|-----|--------|
+| 3   | llama  |
+|     | claude |
 */
 
-SELECT * FROM basket_b
-WHERE id NOT IN (SELECT id FROM basket_a);
+SELECT * FROM session WHERE sid NOT IN (
+    SELECT sid FROM message
+);
 
 /*
 This query returns no rows. Why? Look at the subquery:
 
-SELECT id FROM basket_a
-| id |
-|----|
-| 1  |
-| 1  |
-| 2  |
-|    | <-- NULL
+SELECT sid FROM message;
+| sid |
+|-----|
+| 1   |
+| 1   |
+| 2   |
+|     | <-- NULL
 
 So the expression
 
-WHERE id NOT IN (SELECT id FROM basket_a);
+WHERE sid NOT IN (SELECT sid FROM message);
 
 is equivalent to
 
-WHERE id != 1 AND id != 1 AND id != 2 AND id != NULL
+WHERE sid != 1 AND sid != 1 AND sid != 2 AND sid != NULL
 
-which always evaluates to NULL.
+which always evaluates to either FALSE or NULL, never TRUE.
 
 ----------
 
-This problem is not easy to fix by modifying the subquery.  For example, 
+This problem is not easy to fix by modifying the subquery.
+One idea would be to prevent NULL values in the subquery like:
 
-SELECT * FROM basket_b
-WHERE id NOT IN (SELECT id FROM basket_a WHERE id IS NOT NULL);
+SELECT * FROM session
+WHERE sid NOT IN (
+    SELECT sid FROM message WHERE sid IS NOT NULL
+);
+| sid | name  |
+|-----|-------|
+| 3   | llama |
 
-still does not work.
+is missing the row
+
+|     | claude |
+
+and so still does not work.
 
 ----------
 
@@ -283,30 +299,4 @@ TAKE AWAY POINT:
 If you actually want to capture rows in one table, but not in another table,
 then you should probably use a LEFT/RIGHT JOIN.
 The NOT IN + subquery pattern is a "code smell" and likely cause for bugs.
-*/
-
-----------------------------------------
--- EXAMPLE: "complex" join clauses
-----------------------------------------
-
-SELECT * FROM basket_b FULL JOIN basket_a ON basket_b.id > basket_a.id;
-/*
-  | id | fruit_b | id | fruit_a  |
-  |----|---------|----|----------|
-- | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 1  | Apple    |
-- | 1  | Apple   | 2  | Orange   |
-- | 1  | Apple   |    | Cucumber |
-  | 2  | Apple   | 1  | Apple    |
-  | 2  | Apple   | 1  | Apple    |
-- | 2  | Apple   | 2  | Orange   |
-- | 2  | Apple   |    | Cucumber |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 1  | Apple    |
-- |    | Pear    | 2  | Orange   |
-- |    | Pear    |    | Cucumber |
-+ | 1  | Apple   |    |          |    -- LEFT
-+ |    | Pear    |    |          |    -- LEFT
-+ |    |         | 2  | Orange   |    -- RIGHT
-+ |    |         |    | Cucumber |    -- RIGHT
 */

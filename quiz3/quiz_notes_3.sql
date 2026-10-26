@@ -11,8 +11,9 @@
  * For each INSERT statement:
  * state the total number of bytes required to store the inserted row.
  *
- * For the actual quiz, expect 2 CREATE TABLE commands and 2 INSERT commands.
- * At least one of the tables will be taken from the pagila database.
+ * For the actual quiz:
+ * - Expect 2 CREATE TABLE commands and 2 INSERT commands.
+ * - You must write the correct answer for both postgres and sqlite3.
  */
 
 CREATE TABLE example (
