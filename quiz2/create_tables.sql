@@ -17,7 +17,7 @@ CREATE TABLE session (
  *           or NULL for a message that begins a conversation
  * sid       the session the round was written under
  * model_id  the model that answered
- * user      the user's prompt
+ * user1     the user1's prompt
  * response  the model's reply
  *
  * Every message with a NULL prev_mid is a root, so the whole table is a
@@ -28,7 +28,7 @@ CREATE TABLE message (
     prev_mid INT,
     sid INT,
     model_id TEXT,
-    user TEXT,
+    user1 TEXT,
     response TEXT
 );
 
@@ -50,7 +50,7 @@ VALUES
     (4,   'ab'),
     (5,   'a/b/c');
 
-INSERT INTO message (mid, prev_mid, sid, model_id, user, response)
+INSERT INTO message (mid, prev_mid, sid, model_id, user1, response)
 VALUES
     (10, NULL, 1,    'gpt',    'how do I reverse a linked list in python?',
                                'walk it once with three pointers: prev, cur and next'),
