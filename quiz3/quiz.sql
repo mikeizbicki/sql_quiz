@@ -13,19 +13,6 @@
 
 
 -- Problem 1
-CREATE TABLE probe (
-    id BIGSERIAL PRIMARY KEY,
-    n  SMALLINT NOT NULL DEFAULT 0,
-    a  INT      NOT NULL DEFAULT 0,
-    b  INT      NOT NULL DEFAULT 0,
-    c  INT      NOT NULL DEFAULT 0,
-    d  INT      NOT NULL DEFAULT 0,
-    e  INT      NOT NULL DEFAULT 0,
-    f  INT      NOT NULL DEFAULT 0,
-    g  CHAR     NOT NULL DEFAULT ''
-);
-
--- Problem 2
 CREATE TABLE ledger (
     id    BIGSERIAL PRIMARY KEY,
     amt   NUMERIC(8,2) NOT NULL,
@@ -35,10 +22,34 @@ CREATE TABLE ledger (
     raw   JSONB
 );
 
+
+-- Problem 2
+CREATE TABLE probe (
+    id BIGSERIAL PRIMARY KEY,
+    n  SMALLINT DEFAULT 0,
+    a  SERIAL,
+    b  INT      DEFAULT 0,
+    c  INT2     DEFAULT 0,
+    d  BIGINT   DEFAULT 0,
+    e  INT      DEFAULT 0,
+    f  INT      DEFAULT 0,
+    g  CHAR     NULL
+);
+
+
+
+
 -- Problem 3
-INSERT INTO ledger (amt, tag, note, ts, raw) VALUES
-    (0.1, FALSE, 'xxxxxxxxxxx', '2016-01-25 10:10:10.555555-05:00', NULL);
+INSERT INTO probe (id, a) VALUES (3, 3);
+
+
+
+
+
+
 
 -- Problem 4
-INSERT INTO ledger (amt, tag, note, ts, raw) VALUES
-    (128, NULL, 'xxxxxxxxxxxx', '2016-01-25 10:10:10.555555-05:00', '{"a":1}');
+INSERT INTO probe
+    (id,n,a,b,c,d,e,f,g)
+    VALUES
+    (0, 1, 2, 3, 4, 5, 6, 7, NULL);
