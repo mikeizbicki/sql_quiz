@@ -28,11 +28,11 @@ CREATE TABLE probe (
     id BIGSERIAL PRIMARY KEY,
     n  SMALLINT DEFAULT 0,
     a  SERIAL,
-    b  INT      DEFAULT 0,
-    c  INT2     DEFAULT 0,
-    d  BIGINT   DEFAULT 0,
-    e  INT      DEFAULT 0,
-    f  INT      DEFAULT 0,
+    b  INT      DEFAULT 1,
+    c  INT2     DEFAULT 2,
+    d  BIGINT   DEFAULT 3,
+    e  INT      DEFAULT 4,
+    f  INT      DEFAULT 5,
     g  CHAR     NULL
 );
 
