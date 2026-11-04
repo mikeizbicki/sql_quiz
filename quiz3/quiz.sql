@@ -4,11 +4,11 @@
  *
  * For each CREATE TABLE statement:
  * reorder the columns to use the least amount of disk space.
- * (In sqlite3, the order of columns does not affect row size;
- * leave the table unchanged.)
  *
  * For each INSERT statement:
  * state the total number of bytes required to store the inserted row.
+ *
+ * You must provide the answers for both sqlite3 and postgres.
  */
 
 
