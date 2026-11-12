@@ -1,10 +1,4 @@
 /*
- * Makeup/alternate version of quiz2.
- * Same schema and same concepts as quiz.sql,
- * each problem adds one orthogonal wrinkle
- * (UNION dedup / NOT IN with a filtered subquery /
- *  mirrored LEFT JOIN / reversed recursion with UNION).
- *
  * For each problem below,
  * write the output of the SELECT statement in both sqlite3 and postgres.
  * If the command does not result in an error, you should provide the full table of the output.
@@ -24,6 +18,11 @@ SELECT count(*) FROM (
 ) t;
 
 
+
+
+
+
+
 -- Problem 2
 SELECT count(*)
 FROM session
@@ -32,11 +31,21 @@ WHERE sid NOT IN (
 );
 
 
+
+
+
+
+
 -- Problem 3
 SELECT count(*)
 FROM message
 LEFT JOIN session USING (sid)
 WHERE session.name IS NULL;
+
+
+
+
+
 
 
 -- Problem 4
